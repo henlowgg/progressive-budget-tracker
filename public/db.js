@@ -9,3 +9,7 @@ request.onupgradeneeded = function(event) {
     db.createObjectStore('BudgetStore', { autoIncrement: true });
   }
 };
+
+request.onerror = function(event) {
+    console.log(evt.target.errorCode);
+};
