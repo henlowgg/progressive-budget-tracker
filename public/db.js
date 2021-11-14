@@ -41,9 +41,16 @@ function checkDB() {
 
 // check if there is a budget in the database and if so check if online
 request.onsuccess = function (event) {
-    db = event.target.result;
-    if (navigator.onLine) {
-      checkDB();
-    }
-    };
-    
+  db = event.target.result;
+  if (navigator.onLine) {
+    checkDB();
+  }
+};
+
+function saveRecord(record) {
+  const transaction = db.transaction(["BudgetStore"], "readwrite");
+  const store = transaction.objectStore("BudgetStore");
+  store.add(record);
+}
+
+window.addEventListener("online", checkDB);
