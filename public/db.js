@@ -5,7 +5,7 @@ const request = indexedDB.open("BudgetDB", 1);
 request.onupgradeneeded = function (event) {
   db = event.target.result;
   //   may need to remove !
-  if (!db.objectStoreNames.length === 0) {
+  if (db.objectStoreNames.length === 0) {
     db.createObjectStore("BudgetStore", { autoIncrement: true });
   }
 };
@@ -14,7 +14,7 @@ request.onerror = function (event) {
   console.log(evt.target.errorCode);
 };
 
-function checkDB() {
+function checkDatabase() {
   let transaction = db.transaction(["BudgetStore"], "readwrite");
   const store = transaction.objectStore("BudgetStore");
   const getAll = store.getAll();
@@ -29,28 +29,31 @@ function checkDB() {
           "Content-Type": "application/json",
         },
       })
-        .then((response) => response.json())
-        .then(() => {
-          const transaction = db.transaction(["BudgetStore"], "readwrite");
-          const store = transaction.objectStore("BudgetStore");
-          store.clear();
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.length !== 0) {
+            transaction = db.transaction(["BudgetStore"], "readwrite");
+            const currentStore = transaction.objectStore("BudgetStore");
+            currentStore.clear();
+          }
         });
     }
   };
 }
 
 // check if there is a budget in the database and if so check if online
-request.onsuccess = function (event) {
-  db = event.target.result;
+request.onsuccess = function (evt) {
+  db = evt.target.result;
   if (navigator.onLine) {
-    checkDB();
+    checkDatabase();
   }
 };
 
 function saveRecord(record) {
+  console.log("Record Saved");
   const transaction = db.transaction(["BudgetStore"], "readwrite");
   const store = transaction.objectStore("BudgetStore");
   store.add(record);
 }
 
-window.addEventListener("online", checkDB);
+window.addEventListener("online", checkDatabase);
