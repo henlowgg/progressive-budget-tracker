@@ -38,3 +38,12 @@ function checkDB() {
     }
   };
 }
+
+// check if there is a budget in the database and if so check if online
+request.onsuccess = function (event) {
+    db = event.target.result;
+    if (navigator.onLine) {
+      checkDB();
+    }
+    };
+    
